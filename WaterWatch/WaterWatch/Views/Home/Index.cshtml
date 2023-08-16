@@ -180,7 +180,7 @@
             });
             poly.bindPopup(
                 "<h4><b>Suburb Group:</b> [" + item.suburb_group.toString() + "]</h4>" + 
-                "<h4><b>Neighbourhood: " + item.neighborhood.toString() + "</h4>" +
+                "<h4><b>Neighborhood: " + item.neighborhood.toString() + "</h4>" +
                 "<h4><b>Water Consumption: " + item.averageMonthlyKL.toString() + " KL </h4>" 
             );
             poly.on('mouseover', function(e) {
@@ -235,6 +235,78 @@
         };
         info.addTo(map);
         
+    }
+
+    displayhorBarChart();
+    function displayhorBarChart() {
+        var x_labels = [];
+        var y_data = [];
+
+        $.ajax({
+            url: "/waterconsumption/topten",
+            cache:"false",
+            dataType: "text",
+            type: "GET",
+
+            success: function(data) {
+                var obj = JSON.parse(data);
+
+                //console.log(obj);
+
+                obj.forEach(o => {
+                    x_labels.push(o.neighborhood);
+                });
+
+                var label_array = Object.values(x_labels);
+                var bar_colors = [];
+
+                obj.forEach(o => {
+                    y_data.push(o.averageMonthlyKL);
+                    bar_colors.push(getColor(o.averageMonthlyKL));
+                });
+
+                var data_array = Object.values(y_data);
+                
+                var ctx = document.getElementById("horBarChart").getContext("2d");
+                var canvas = document.getElementById("horBarChart");
+                var parent = document.getElementById("info");
+
+                var horBarChart = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: label_array,
+                        datasets: [{
+                            label: 'water',
+                            backgroundColor: bar_colors, //"rgba(35,132,67, 0.6)",
+                            borderColor: "rgba(0,90,50, 1)",
+                            data: data_array
+                        }]
+                    },
+
+                    options: {
+                        scaleShowValues: true,
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    autoSkip: false,
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            },
+
+            error: function(data) {
+                alert('error; '+ eval(error));
+            }
+        });
+
     }
 
 
