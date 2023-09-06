@@ -9,7 +9,15 @@ builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(
     builder.Configuration.GetConnectionString("DefaultConnection")
 ));
 
-builder.Services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
+builder.Services.AddScoped<IDataContext>(provider =>
+{
+    var dataContext = provider.GetService<DataContext>();
+    if (dataContext == null)
+    {
+        throw new InvalidOperationException("DataContext not registered in the DI container.");
+    }
+    return dataContext;
+});
 
 builder.Services.AddScoped<IWaterConsumptionRepository, WaterConsumptionRepository>();
 

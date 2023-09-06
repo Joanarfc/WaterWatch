@@ -7,7 +7,7 @@ namespace WaterWatch.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) 
         {
-
+            Consumptions = Set<WaterConsumption>();
         }
         public DbSet<WaterConsumption> Consumptions { get; set; }
     }
